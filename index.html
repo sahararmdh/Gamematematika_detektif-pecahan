@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Detektif Pecahan</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="script.js"></script>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', sans-serif;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    #game-container {
+      padding: 20px;
+      background-size: cover;
+      background-position: center;
+      min-height: 100vh;
+    }
+    h1 {
+      color: #ff6600;
+      margin-bottom: 5px;
+    }
+    #level-info, #score {
+      font-weight: bold;
+      margin-top: 10px;
+      font-size: 18px;
+      color: #fff;
+    }
+    #character {
+      width: 150px;
+      margin: 15px auto;
+    }
+    #question-box {
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 15px;
+      margin: 15px auto;
+      width: 90%;
+      max-width: 400px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    #question {
+      font-size: 20px;
+      margin: 10px 0;
+      color: #222;
+    }
+    #answer {
+      padding: 8px;
+      font-size: 16px;
+      width: 60%;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 8px 16px;
+      font-size: 16px;
+      background-color: #00cc99;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #00b386;
+    }
+    #timer {
+      margin-top: 10px;
+      font-size: 16px;
+      color: #cc0000;
+    }
+    #result {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <audio id="bg-music" autoplay loop>
+    <source src="assets/musik-latar.mp3" type="audio/mpeg">
+  </audio>
+
+  <div id="game-container">
+    <h1>Detektif Pecahan</h1>
+    <div id="level-info">Level 1</div>
+    <img id="character" src="assets/karakter.png" alt="Detektif">
+    <div id="question-box">
+      <p id="question">Soal muncul di sini...</p>
+      <input type="text" id="answer" placeholder="Jawabanmu...">
+      <br>
+      <button onclick="checkAnswer()">Kirim</button>
+      <div id="timer">⏳ 15</div>
+    </div>
+    <div id="result"></div>
+    <div id="score">Skor: 0</div>
+  </div>
+
+  <script>
+    const questions = [
+      { q: "1/2 + 1/4 = ?", a: "3/4" },
+      { q: "3/5 = .../10", a: "6/10" },
+      { q: "1 1/2 = .../2", a: "3/2" },
+      { q: "Urutkan: 1/3, 2/3, 1/2", a: "1/3, 1/2, 2/3" },
+      { q: "Mana lebih besar: 2/5 atau 3/7?", a: "3/7" }
+    ];
+
+    const backgrounds = [
+      'assets/background-level1.png',
+      'assets/background-level2.png',
+      'assets/background-level3.png',
+      'assets/background-level4.png',
+      'assets/background-level5.png'
+    ];
+
+    let current = 0;
+    let score = 0;
+    let timer;
+    let timeLeft = 60;
+
+    const qEl = document.getElementById("question");
+    const aEl = document.getElementById("answer");
+    const resultEl = document.getElementById("result");
+    const scoreEl = document.getElementById("score");
+    const timerEl = document.getElementById("timer");
+    const levelEl = document.getElementById("level-info");
+    const container = document.getElementById("game-container");
+
+    function loadQuestion() {
+      if (current >= questions.length) {
+        qEl.innerText = "🎉 Selamat! Kamu menyelesaikan semua level.";
+        document.querySelector("#question-box").style.display = "none";
+        return;
+      }
+      qEl.innerText = questions[current].q;
+      levelEl.innerText = "Level " + (current + 1);
+      aEl.value = "";
+      resultEl.innerText = "";
+      timeLeft = 60;
+      timerEl.innerText = `⏳ ${timeLeft}`;
+      container.style.backgroundImage = `url('${backgrounds[current]}')`;
+      clearInterval(timer);
+      timer = setInterval(() => {
+        timeLeft--;
+        timerEl.innerText = `⏳ ${timeLeft}`;
+        if (timeLeft === 0) {
+          clearInterval(timer);
+          resultEl.innerText = "⛔ Waktu habis!";
+        }
+      }, 1000);
+    }
+
+    function checkAnswer() {
+      if (timeLeft === 0) return;
+      const userAns = aEl.value.trim();
+      if (userAns === questions[current].a) {
+        resultEl.innerText = "✅ Benar!";
+        score += 10;
+        scoreEl.innerText = `Skor: ${score}`;
+        current++;
+        setTimeout(loadQuestion, 1000);
+      } else {
+        resultEl.innerText = "❌ Salah, coba lagi!";
+      }
+    }
+
+    window.onload = loadQuestion;
+  </script>
+</body>
+</html>
